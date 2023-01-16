@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using SmartSchool.WebAPI.Data;
+using SmartSchool.WebAPI.DTO;
 using SmartSchool.WebAPI.Models;
 
 namespace SmartSchool.WebAPI.Controllers
@@ -13,63 +15,72 @@ namespace SmartSchool.WebAPI.Controllers
     public class ProfessorController : ControllerBase
     {
         private readonly IRepository _repository;
+        private readonly IMapper _mapper;
 
-        public ProfessorController(IRepository repository)
+        public ProfessorController(IRepository repository, IMapper mapper)
         {
             _repository = repository;
+            _mapper = mapper;
         }
 
         [HttpGet]
         public IActionResult Get()
         {
-            var result = _repository.GetAllProfessores(true);
-            return Ok(result);
+            var professor = _repository.GetAllProfessores(true);
+            return Ok(_mapper.Map<ProfessorDTO>(professor));
         }
 
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
-            var aluno = _repository.GetAllAlunosById(id);
-            return Ok(aluno);
+            var professor = _repository.GetAllProfessoresById(id);
+            var professorDTO = _mapper.Map<ProfessorDTO>(professor);
+            return Ok(professorDTO);
         }
 
         [HttpPost]
-        public IActionResult Post(Professor professor)
+        public IActionResult Post(ProfessorRegistroDTO professorRegistroDTO)
         {
+            var professor = _mapper.Map<Professor>(professorRegistroDTO);
+
             _repository.Add(professor);
             if (_repository.SaveChanges())
             {
-                return Ok(professor);
+                return Created($"/api/professor{professorRegistroDTO.Id}", _mapper.Map<ProfessorRegistroDTO>(professor));
             }
 
             return BadRequest("Professor não add");
         }
 
         [HttpPut("{id}")]
-        public IActionResult Put(int id, Professor professor)
+        public IActionResult Put(int id, ProfessorRegistroDTO professorRegistroDTO)
         {
             var profePut = _repository.GetAllAlunosById(id);
             if (profePut == null) return BadRequest("Aluno não foi encontrado");
 
-            _repository.Update(professor);
+            _mapper.Map(professorRegistroDTO, profePut);
+
+            _repository.Update(profePut);
             if (_repository.SaveChanges())
             {
-                return Ok(professor);
+                return Created($"/api/professor{professorRegistroDTO.Id}", _mapper.Map<ProfessorRegistroDTO>(profePut));
             }
 
             return BadRequest("Professor não atualizado");
         }
 
         [HttpPatch]
-        public IActionResult Patch(int id, Professor professor)
+        public IActionResult Patch(int id, ProfessorRegistroDTO professorRegistroDTO)
         {
             var profePatch = _repository.GetAllAlunosById(id);
             if (profePatch == null) return BadRequest("Aluno não foi encontrado");
 
-            _repository.Update(professor);
+            _mapper.Map(professorRegistroDTO, profePatch);
+
+            _repository.Update(profePatch);
             if (_repository.SaveChanges())
             {
-                return Ok(professor);
+                return Created($"/api/professor{professorRegistroDTO.Id}", _mapper.Map<ProfessorRegistroDTO>(profePatch));
             }
 
             return BadRequest("Aluno não atualizado");

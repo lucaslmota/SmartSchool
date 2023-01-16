@@ -30,11 +30,13 @@ namespace SmartSchool.WebAPI
             services.AddDbContext<SmartContext>(
                 context => context.UseSqlServer(Configuration.GetConnectionString("ConnStr"))
             );
+            services.AddControllers()
+                    .AddNewtonsoftJson(option => option.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             services.AddScoped<IRepository, Repository>();
 
-            services.AddControllers()
-                    .AddNewtonsoftJson(option => option.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

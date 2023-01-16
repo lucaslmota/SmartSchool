@@ -1,10 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using SmartSchool.WebAPI.Data;
+using SmartSchool.WebAPI.DTO;
 using SmartSchool.WebAPI.Models;
 
 namespace SmartSchool.WebAPI.Controllers
@@ -14,24 +11,29 @@ namespace SmartSchool.WebAPI.Controllers
     public class AlunoController : ControllerBase
     {
         private readonly IRepository _repository;
+        private readonly IMapper _mapper;
 
-        public AlunoController(IRepository repository)
+        public AlunoController(IRepository repository, IMapper mapper)
         {
-            _repository = repository; ;
+            _repository = repository;
+            _mapper = mapper;
         }
 
         [HttpGet]
         public IActionResult Get()
         {
-            var result = _repository.GetAllAlunos(true);
-            return Ok(result);
+            var alunos = _repository.GetAllAlunos(true);
+
+            return Ok(_mapper.Map<IEnumerable<AlunoDTO>>(alunos));
         }
 
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
             var aluno = _repository.GetAllAlunosById(id);
-            return Ok(aluno);
+
+            var alunoDTO = _mapper.Map<AlunoDTO>(aluno);
+            return Ok(alunoDTO);
         }
 
         // [HttpGet("{ByName}")]
@@ -44,41 +46,47 @@ namespace SmartSchool.WebAPI.Controllers
         // }
 
         [HttpPost]
-        public IActionResult Post(Aluno aluno)
+        public IActionResult Post(AlunoRegisterDTO alunoDTO)
         {
+            var aluno = _mapper.Map<Aluno>(alunoDTO);
+
             _repository.Add(aluno);
             if (_repository.SaveChanges())
             {
-                return Ok(aluno);
+                return Created($"/api/aluno{alunoDTO.Id}", _mapper.Map<AlunoDTO>(aluno));
             }
             return BadRequest("Aluno não encontrado");
         }
 
         [HttpPut("{id}")]
-        public IActionResult Put(int id, Aluno aluno)
+        public IActionResult Put(int id, AlunoRegisterDTO alunoDTO)
         {
             var alunoPut = _repository.GetAllAlunosById(id);
             if (alunoPut == null) return BadRequest("Aluno não foi encontrado");
 
-            _repository.Update(aluno);
+            _mapper.Map(alunoDTO, alunoPut);
+
+            _repository.Update(alunoPut);
             if (_repository.SaveChanges())
             {
-                return Ok(aluno);
+                return Created($"/api/aluno{alunoDTO.Id}", _mapper.Map<AlunoDTO>(alunoPut));
             }
 
             return BadRequest("Aluno não atualizado");
         }
 
         [HttpPatch]
-        public IActionResult Patch(int id, Aluno aluno)
+        public IActionResult Patch(int id, AlunoRegisterDTO alunoDTO)
         {
             var alunoPatch = _repository.GetAllAlunosById(id);
             if (alunoPatch == null) return BadRequest("Aluno não foi encontrado");
 
-            _repository.Update(aluno);
+            _mapper.Map(alunoDTO, alunoPatch);
+
+            _repository.Update(alunoPatch);
             if (_repository.SaveChanges())
             {
-                return Ok(aluno);
+                return Created($"/api/aluno{alunoDTO.Id}", _mapper.Map<AlunoDTO>(alunoPatch));
             }
 
             return BadRequest("Aluno não atualizado");
