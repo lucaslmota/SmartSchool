@@ -25,16 +25,16 @@ namespace SmartSchool.WebAPI.Controllers
         }
 
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
-            var professor = _repository.GetAllProfessores(true);
+            var professor = await _repository.GetAllProfessoresAsync(true);
             return Ok(_mapper.Map<ProfessorDTO>(professor));
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            var professor = _repository.GetAllProfessoresById(id);
+            var professor = await _repository.GetAllProfessoresByIdAsync(id);
             var professorDTO = _mapper.Map<ProfessorDTO>(professor);
             return Ok(professorDTO);
         }
@@ -54,12 +54,12 @@ namespace SmartSchool.WebAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult Put(int id, ProfessorRegistroDTO professorRegistroDTO)
+        public async Task<IActionResult> Put(int id, ProfessorRegistroDTO professorRegistroDTO)
         {
-            var profePut = _repository.GetAllAlunosById(id);
+            var profePut = _repository.GetAllProfessoresByIdAsync(id);
             if (profePut == null) return BadRequest("Aluno não foi encontrado");
 
-            _mapper.Map(professorRegistroDTO, profePut);
+            await _mapper.Map(professorRegistroDTO, profePut);
 
             _repository.Update(profePut);
             if (_repository.SaveChanges())
@@ -71,12 +71,12 @@ namespace SmartSchool.WebAPI.Controllers
         }
 
         [HttpPatch]
-        public IActionResult Patch(int id, ProfessorRegistroDTO professorRegistroDTO)
+        public async Task<IActionResult> Patch(int id, ProfessorRegistroDTO professorRegistroDTO)
         {
-            var profePatch = _repository.GetAllAlunosById(id);
+            var profePatch = _repository.GetAllProfessoresByIdAsync(id);
             if (profePatch == null) return BadRequest("Aluno não foi encontrado");
 
-            _mapper.Map(professorRegistroDTO, profePatch);
+            await _mapper.Map(professorRegistroDTO, profePatch);
 
             _repository.Update(profePatch);
             if (_repository.SaveChanges())
@@ -88,9 +88,9 @@ namespace SmartSchool.WebAPI.Controllers
         }
 
         [HttpDelete]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var profeDelete = _repository.GetAllAlunosById(id);
+            var profeDelete = await _repository.GetAllProfessoresByIdAsync(id);
             if (profeDelete == null) return BadRequest("Aluno não foi encontrado");
 
             _repository.Delete(profeDelete);
