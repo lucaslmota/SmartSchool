@@ -5,13 +5,12 @@ using System.Threading.Tasks;
 
 namespace SmartSchool.WebAPI.DTO
 {
-    public class ProfessorDTO
+    public class AlunoPatchDTO
     {
-        public int Id { get; set; }
-        public int Registro { get; set; }
+        public int? Id { get; set; }
         public string Nome { get; set; }
+        public string Sobrenome { get; set; }
         public string Telefone { get; set; }
         public bool Ativo { get; set; }
-        public IEnumerable<DisciplinaDto> Disciplinas { get; set; }
     }
 }

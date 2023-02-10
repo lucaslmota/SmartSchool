@@ -39,6 +39,15 @@ namespace SmartSchool.WebAPI.Controllers
             return Ok(professorDTO);
         }
 
+        [HttpGet("byaluno{idAluno}")]
+        public async Task<IActionResult> GetByIdAluno(int alunoId)
+        {
+            var professores = await _repository.GetAllProfessoresByAlunoId(alunoId, true);
+            if (professores == null) return BadRequest("O professores não foi encontrado");
+
+            return Ok(_mapper.Map<IEnumerable<ProfessorDTO>>(professores));
+        }
+
         [HttpPost]
         public IActionResult Post(ProfessorRegistroDTO professorRegistroDTO)
         {

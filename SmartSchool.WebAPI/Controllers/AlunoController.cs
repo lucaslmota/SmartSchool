@@ -38,7 +38,7 @@ namespace SmartSchool.WebAPI.Controllers
         {
             var aluno = await _repository.GetAllAlunosByIdAsync(id);
 
-            var alunoDTO = _mapper.Map<AlunoDTO>(aluno);
+            var alunoDTO = _mapper.Map<AlunoRegisterDTO>(aluno);
             return Ok(alunoDTO);
         }
 
@@ -82,7 +82,7 @@ namespace SmartSchool.WebAPI.Controllers
         }
 
         [HttpPatch]
-        public async Task<IActionResult> Patch(int id, AlunoRegisterDTO alunoDTO)
+        public async Task<IActionResult> Patch(int id, AlunoPatchDTO alunoDTO)
         {
             var alunoPatch = _repository.GetAllAlunosByIdAsync(id);
             if (alunoPatch == null) return BadRequest("Aluno não foi encontrado");
@@ -98,12 +98,31 @@ namespace SmartSchool.WebAPI.Controllers
             return BadRequest("Aluno não atualizado");
         }
 
+        // api/aluno/{id}/trocarEstado
+        [HttpPatch("{id}/trocarEstado")]
+        public async Task<IActionResult> trocarEstado(int id, TrocaEstadoDto trocaEstado)
+        {
+            var aluno = await _repository.GetAllAlunosByIdAsync(id);
+            if (aluno == null) return BadRequest("Aluno não encontrado");
+
+            aluno.Ativo = trocaEstado.Estado;
+
+            _repository.Update(aluno);
+            if (_repository.SaveChanges())
+            {
+                var msn = aluno.Ativo ? "ativado" : "desativado";
+                return Ok(new { message = $"Aluno {msn} com sucesso!" });
+            }
+
+            return BadRequest("Aluno não Atualizado");
+        }
+
+
         [HttpDelete]
         public async Task<IActionResult> Delete(int id)
         {
             var alunoDelete = await _repository.GetAllAlunosByIdAsync(id);
             if (alunoDelete == null) return BadRequest("Aluno não foi encontrado");
-
             _repository.Delete(alunoDelete);
             if (_repository.SaveChanges())
             {

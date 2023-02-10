@@ -22,6 +22,7 @@ namespace SmartSchool.WebAPI.Data
         //Professores
         Task<Professor[]> GetAllProfessoresAsync(bool includeAlunos = false);
         Task<Professor[]> GetAllProfessoresByDisciplinaAsync(int disciplinaId, bool includeAlunos = false);
-        Task<Professor> GetAllProfessoresByIdAsync(int professorId, bool includeProfessor = false);
+        Task<Professor> GetAllProfessoresByIdAsync(int professorId, bool includeAlunos = false);
+        Task<Professor[]> GetAllProfessoresByAlunoId(int alunoId, bool includeAlunos = false);
     }
 }
